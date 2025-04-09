@@ -10,7 +10,7 @@ public static class UmbracoBuilderExtensions
 {
     public static IUmbracoBuilder AddOrphanedLinks(this IUmbracoBuilder builder)
     {
-        if (!builder.Config.GetValue("Umbraco:CMS:Integrations:Digbyswift:OrphanedLinks:Enabled", defaultValue: false))
+        if (!builder.Config.GetValue("Digbyswift:OrphanedLinks:Enabled", defaultValue: false))
             return builder;
 
         builder

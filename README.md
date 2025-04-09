@@ -51,15 +51,9 @@ By default the package is enabled, but you can disable it using the following co
 
 ```json
 {
-  "Umbraco": {
-    "CMS": {
-      "Integrations": {
-        "Digbyswift": {
-          "OrphanedLinks": {
-            "Enabled": false
-          }
-        }
-      }
+  "Digbyswift": {
+    "OrphanedLinks": {
+      "Enabled": false
     }
   }
 }

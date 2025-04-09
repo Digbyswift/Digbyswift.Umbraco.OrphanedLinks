@@ -38,7 +38,7 @@ steps:
   inputs:
     SonarQube: SonarCloud
     organization: 'digbyswift-oss'
-    projectKey: 'digbyswift-oss_digbyswift-core'
+    projectKey: 'digbyswift-oss_digbyswift-orphaned-links'
     projectName: Digbyswift.Umbraco.OrphanedLinks
     projectVersion: '$(Build.BuildNumber)'
 
@@ -79,4 +79,3 @@ steps:
   inputs:
     PathtoPublish: '$(build.artifactstagingdirectory)'
   condition: succeededOrFailed()
-
