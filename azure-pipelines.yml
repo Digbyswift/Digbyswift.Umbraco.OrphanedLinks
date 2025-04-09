@@ -3,6 +3,7 @@ pool:
   demands: java
 
 variables:
+  BuildConfiguration: 'Release'
   NugetPackages.Path: '$(Pipeline.Workspace)/.nuget/packages'
 
 steps:
