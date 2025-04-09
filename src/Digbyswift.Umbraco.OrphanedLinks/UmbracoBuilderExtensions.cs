@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Digbyswift.Umbraco.OrphanedLinks.Migration;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Routing;
@@ -18,6 +20,8 @@ public static class UmbracoBuilderExtensions
             .AddNotificationHandler<ContentPublishingNotification, OrphanedContentHandler>()
             .AddNotificationHandler<ContentMovingToRecycleBinNotification, OrphanedContentHandler>()
             .AddNotificationHandler<ContentCacheRefresherNotification, OrphanedContentHandler>();
+
+        builder.Services.AddSingleton<IOrphanedLinkRepository, OrphanedLinkRepository>();
 
         // Register a facade for including the outputting of product
         // redirect original URLs in the redirect management dashboard.
