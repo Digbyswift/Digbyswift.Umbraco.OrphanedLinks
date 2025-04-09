@@ -27,7 +27,7 @@ steps:
   displayName: Restore
   inputs:
     command: restore
-    projects: '**/Digbyswift.Umbraco.OrphanedLinks.sln'
+    projects: '**\*.sln'
     restoreArguments: '--locked-mode'
     verbosityRestore: Detailed
     verbosityPack: Detailed
@@ -39,13 +39,13 @@ steps:
     SonarQube: SonarCloud
     organization: 'digbyswift-oss'
     projectKey: 'digbyswift-oss_digbyswift-orphaned-links'
-    projectName: Digbyswift.Umbraco.OrphanedLinks
+    projectName: 'Digbyswift.Umbraco.OrphanedLinks'
     projectVersion: '$(Build.BuildNumber)'
 
 - task: DotNetCoreCLI@2
   displayName: Build
   inputs:
-    projects: '$(Parameters.RestoreBuildProjects)'
+    projects: '**\*.sln'
     arguments: '--packages $(NugetPackages.Path) --configuration $(BuildConfiguration) -property:SolutionDir="$(Build.SourcesDirectory)\src"'
     verbosityRestore: Detailed
     verbosityPack: Detailed
@@ -54,7 +54,7 @@ steps:
   displayName: Test
   inputs:
     command: test
-    projects: '$(Parameters.TestProjects)'
+    projects: '**\*.Test.csproj'
     arguments: '--configuration $(BuildConfiguration) -property:SolutionDir="$(Build.SourcesDirectory)\src"'
     verbosityRestore: Detailed
     verbosityPack: Detailed
