@@ -1,0 +1,82 @@
+pool:
+  name: Digbyswift (Ionos)
+  demands: java
+
+variables:
+  NugetPackages.Path: '$(Pipeline.Workspace)/.nuget/packages'
+
+steps:
+- powershell: |
+   If(!(test-path -PathType container $(NugetPackages.Path)))
+   {
+         New-Item -ItemType directory -Path $(NugetPackages.Path)
+   }
+  displayName: 'Create NuGet cache directory'
+
+- task: Cache@2
+  displayName: 'Cache NuGet files'
+  inputs:
+    key: 'nuget | "$(Agent.OS)" | **/packages.lock.json,!**/bin/**,!**/obj/**'
+    path: '$(NugetPackages.Path)'
+    cacheHitVar: 'NUGET_CACHE_RESTORED'
+    restoreKeys: |
+     nuget | "$(Agent.OS)"
+     nuget
+
+- task: DotNetCoreCLI@2
+  displayName: Restore
+  inputs:
+    command: restore
+    projects: '**/Digbyswift.Umbraco.OrphanedLinks.sln'
+    restoreArguments: '--locked-mode'
+    verbosityRestore: Detailed
+    verbosityPack: Detailed
+  condition: ne(variables.NUGET_CACHE_RESTORED, true)
+
+- task: SonarSource.sonarcloud.14d9cde6-c1da-4d55-aa01-2965cd301255.SonarCloudPrepare@3
+  displayName: 'Prepare analysis on SonarQube Cloud'
+  inputs:
+    SonarQube: SonarCloud
+    organization: 'digbyswift-oss'
+    projectKey: 'digbyswift-oss_digbyswift-core'
+    projectName: Digbyswift.Umbraco.OrphanedLinks
+    projectVersion: '$(Build.BuildNumber)'
+
+- task: DotNetCoreCLI@2
+  displayName: Build
+  inputs:
+    projects: '$(Parameters.RestoreBuildProjects)'
+    arguments: '--packages $(NugetPackages.Path) --configuration $(BuildConfiguration) -property:SolutionDir="$(Build.SourcesDirectory)\src"'
+    verbosityRestore: Detailed
+    verbosityPack: Detailed
+
+- task: DotNetCoreCLI@2
+  displayName: Test
+  inputs:
+    command: test
+    projects: '$(Parameters.TestProjects)'
+    arguments: '--configuration $(BuildConfiguration) -property:SolutionDir="$(Build.SourcesDirectory)\src"'
+    verbosityRestore: Detailed
+    verbosityPack: Detailed
+
+- task: SonarSource.sonarcloud.ce096e50-6155-4de8-8800-4221aaeed4a1.SonarCloudAnalyze@3
+  displayName: 'Run Code Analysis'
+
+- task: SonarSource.sonarcloud.38b27399-a642-40af-bb7d-9971f69712e8.SonarCloudPublish@3
+  displayName: 'Publish Quality Gate Result'
+
+- task: DotNetCoreCLI@2
+  displayName: Pack
+  inputs:
+    command: pack
+    verbosityRestore: Detailed
+    nobuild: true
+    includesymbols: true
+    verbosityPack: Detailed
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact'
+  inputs:
+    PathtoPublish: '$(build.artifactstagingdirectory)'
+  condition: succeededOrFailed()
+

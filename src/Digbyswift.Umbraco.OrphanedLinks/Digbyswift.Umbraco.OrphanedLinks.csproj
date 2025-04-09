@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Title>Digbyswift.Umbraco.OrphanedLinks</Title>
+        <PackageProjectUrl>https://github.com/digbyswift/Digbyswift.Umbraco.OrphanedLinks</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/digbyswift/Digbyswift.Umbraco.OrphanedLinks</RepositoryUrl>
+        <PackageTags>c# umbraco</PackageTags>
+        <PackageVersion>1.0.0-beta1</PackageVersion>
+        <AssemblyVersion>1.0.0</AssemblyVersion>
+        <FileVersion>1.0.0</FileVersion>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="../../package-icon.png" Pack="true" PackagePath="" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="../../LICENSE" Pack="true" PackagePath="" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="../../README.md" Pack="true" PackagePath="" />
+    </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="Digbyswift.Core" Version="2.5.1" />
+      <PackageReference Include="LazyCache.AspNetCore" Version="2.4.0" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.3" />
+      <PackageReference Include="Umbraco.Cms.Infrastructure" Version="13.7.2" />
+      <PackageReference Include="Umbraco.Cms.Web.Common" Version="13.7.2" />
+    </ItemGroup>
+</Project>
