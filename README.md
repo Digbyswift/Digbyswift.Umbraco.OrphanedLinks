@@ -1,7 +1,7 @@
 # Digbyswift.Umbraco.OrphanedLinks
 
-[![NuGet version (Digbyswift.Umbraco.OrphanedLinks)](https://img.shields.io/nuget/v/Digbyswift.Digbyswift.Umbraco.OrphanedLinks.svg)](https://www.nuget.org/packages/Digbyswift.Umbraco.OrphanedLinks/)
-![Build status](https://dev.azure.com/digbyswift/Digbyswift%20-%20OSS%20Packages/_apis/build/status/Build%20Digbyswift.Umbraco.OrphanedLinks)
+[![NuGet version (Digbyswift.Umbraco.OrphanedLinks)](https://img.shields.io/nuget/v/Digbyswift.Umbraco.OrphanedLinks.svg)](https://www.nuget.org/packages/Digbyswift.Umbraco.OrphanedLinks/)
+[![Build Status](https://dev.azure.com/digbyswift/Digbyswift%20-%20NuGet%20Packages/_apis/build/status%2FDigbyswift.Digbyswift.Umbraco.OrphanedLinks?branchName=master)](https://dev.azure.com/digbyswift/Digbyswift%20-%20NuGet%20Packages/_build/latest?definitionId=57&branchName=master)
 
 Prevents broken links in Umbraco CMS rich text editors when linked content is unpublished.
 
