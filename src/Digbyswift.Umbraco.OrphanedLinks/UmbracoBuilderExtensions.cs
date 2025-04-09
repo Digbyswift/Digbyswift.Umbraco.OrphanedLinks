@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Digbyswift.Umbraco.OrphanedLinks.Migration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
@@ -13,6 +14,8 @@ public static class UmbracoBuilderExtensions
     {
         if (!builder.Config.GetValue("Digbyswift:OrphanedLinks:Enabled", defaultValue: false))
             return builder;
+
+        builder.Components().Append<MigrationComponent>();
 
         builder
             .AddNotificationHandler<ContentUnpublishingNotification, OrphanedContentHandler>()
