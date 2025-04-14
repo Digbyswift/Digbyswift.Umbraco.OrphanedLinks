@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Digbyswift.Core.Constants;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -44,7 +45,14 @@ public class OrphanedContentHandler :
     {
         foreach (var key in notification.PublishedEntities.Select(x => x.Key))
         {
-            _orphanedLinkRepository.Delete(key);
+            try
+            {
+                _orphanedLinkRepository.Delete(key);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to remove {key} #orphaned-links", key);
+            }
         }
     }
 
@@ -64,14 +72,34 @@ public class OrphanedContentHandler :
 
         foreach (var key in keys)
         {
-            var url = umbracoContextReference.UmbracoContext.Content.GetById(key)?.Url(mode: UrlMode.Relative);
-            if (url == null)
+            var publishedContent = umbracoContextReference.UmbracoContext.Content.GetById(key);
+            if (publishedContent == null)
             {
                 _logger.LogWarning("Unable to locate content for {key} #orphaned-links", key);
                 continue;
             }
 
-            _orphanedLinkRepository.Add(key, url);
+            if (publishedContent.TemplateId is null or 0)
+            {
+                _logger.LogDebug("Skipping content {key}: No template #orphaned-links", key);
+                continue;
+            }
+
+            var url = publishedContent.Url(mode: UrlMode.Relative);
+            if (url == StringConstants.Hash)
+            {
+                _logger.LogDebug("Skipping content {key}: No URL #orphaned-links", key);
+                continue;
+            }
+
+            try
+            {
+                _orphanedLinkRepository.Add(key, url);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to add content {key} #orphaned-links", key);
+            }
         }
     }
 }
