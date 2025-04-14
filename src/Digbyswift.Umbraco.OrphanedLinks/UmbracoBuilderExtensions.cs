@@ -35,7 +35,7 @@ public static class UmbracoBuilderExtensions
 
         // Register default implementation of LazyCache if it
         // hasn't already been registered.
-        builder.Services.TryAddScoped<IAppCache, CachingService>();
+        builder.Services.TryAddSingleton<IAppCache, CachingService>();
 
         // Register a facade for including the outputting of product
         // redirect original URLs in the redirect management dashboard.
