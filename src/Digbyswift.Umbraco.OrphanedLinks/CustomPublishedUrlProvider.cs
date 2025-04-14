@@ -77,7 +77,17 @@ public class CustomPublishedUrlProvider : IPublishedUrlProvider
 
     #region GetMediaUrl
 
-    public string GetMediaUrl(Guid id, UrlMode mode = UrlMode.Default, string? culture = null, string propertyAlias = global::Umbraco.Cms.Core.Constants.Conventions.Media.File, Uri? current = null) => _urlProvider.GetMediaUrl(id, mode, culture, propertyAlias, current);
+    public string GetMediaUrl(Guid id, UrlMode mode = UrlMode.Default, string? culture = null, string propertyAlias = global::Umbraco.Cms.Core.Constants.Conventions.Media.File, Uri? current = null)
+    {
+        var workingUrl = _urlProvider.GetMediaUrl(id, mode, culture, propertyAlias, current);
+
+        if (!String.IsNullOrWhiteSpace(workingUrl) && workingUrl != StringConstants.Hash)
+            return workingUrl;
+
+        var url = _orphanedLinkRepository.Get(id);
+        return String.IsNullOrWhiteSpace(url) ? workingUrl : url;
+    }
+
     public string GetMediaUrl(IPublishedContent? content, UrlMode mode = UrlMode.Default, string? culture = null, string propertyAlias = global::Umbraco.Cms.Core.Constants.Conventions.Media.File, Uri? current = null) => _urlProvider.GetMediaUrl(content, mode, culture, propertyAlias, current);
 
     #endregion

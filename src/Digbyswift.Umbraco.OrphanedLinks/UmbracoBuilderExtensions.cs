@@ -20,10 +20,16 @@ public static class UmbracoBuilderExtensions
         builder.Components().Append<MigrationComponent>();
 
         builder
+
+            // Content notifications
             .AddNotificationHandler<ContentUnpublishingNotification, OrphanedContentHandler>()
             .AddNotificationHandler<ContentPublishingNotification, OrphanedContentHandler>()
             .AddNotificationHandler<ContentMovingToRecycleBinNotification, OrphanedContentHandler>()
-            .AddNotificationHandler<ContentCacheRefresherNotification, OrphanedContentHandler>();
+            .AddNotificationHandler<ContentCacheRefresherNotification, OrphanedContentHandler>()
+
+            // Media notifications
+            .AddNotificationHandler<MediaMovingToRecycleBinNotification, OrphanedMediaHandler>()
+            .AddNotificationHandler<MediaCacheRefresherNotification, OrphanedMediaHandler>();
 
         builder.Services.AddSingleton<IOrphanedLinkRepository, OrphanedLinkRepository>();
 
