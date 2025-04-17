@@ -1,8 +1,6 @@
 ﻿using Digbyswift.Umbraco.OrphanedLinks.Migration;
-using LazyCache;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Routing;
@@ -14,22 +12,30 @@ public static class UmbracoBuilderExtensions
 {
     public static IUmbracoBuilder AddOrphanedLinks(this IUmbracoBuilder builder)
     {
-        if (!builder.Config.GetValue("Digbyswift:OrphanedLinks:Enabled", defaultValue: true))
+        var configSection = builder.Config.GetSection(OrphanedLinksSettings.SectionName);
+        var settings = configSection.Get<OrphanedLinksSettings>();
+        if (settings is not { IsEnabled: true })
             return builder;
 
+        builder.Services.Configure<OrphanedLinksSettings>(configSection);
         builder.Components().Append<MigrationComponent>();
 
-        builder
+        if (settings.Content.IsEnabled)
+        {
+            builder
+                .AddNotificationHandler<ContentUnpublishingNotification, OrphanedContentHandler>()
+                .AddNotificationHandler<ContentPublishingNotification, OrphanedContentHandler>()
+                .AddNotificationHandler<ContentMovingToRecycleBinNotification, OrphanedContentHandler>()
+                .AddNotificationHandler<ContentCacheRefresherNotification, OrphanedContentHandler>();
+        }
 
-            // Content notifications
-            .AddNotificationHandler<ContentUnpublishingNotification, OrphanedContentHandler>()
-            .AddNotificationHandler<ContentPublishingNotification, OrphanedContentHandler>()
-            .AddNotificationHandler<ContentMovingToRecycleBinNotification, OrphanedContentHandler>()
-            .AddNotificationHandler<ContentCacheRefresherNotification, OrphanedContentHandler>()
-
-            // Media notifications
-            .AddNotificationHandler<MediaMovingToRecycleBinNotification, OrphanedMediaHandler>()
-            .AddNotificationHandler<MediaCacheRefresherNotification, OrphanedMediaHandler>();
+        if (settings.Media.IsEnabled)
+        {
+            builder
+                .AddNotificationHandler<MediaMovingToRecycleBinNotification, OrphanedMediaHandler>()
+                .AddNotificationHandler<MediaMovingNotification, OrphanedMediaHandler>()
+                .AddNotificationHandler<MediaCacheRefresherNotification, OrphanedMediaHandler>();
+        }
 
         builder.Services.AddSingleton<IOrphanedLinkRepository, OrphanedLinkRepository>();
 

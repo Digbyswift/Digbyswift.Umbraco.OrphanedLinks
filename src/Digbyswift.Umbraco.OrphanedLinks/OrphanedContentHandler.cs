@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Digbyswift.Core.Constants;
+using Digbyswift.Core.Extensions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Web;
@@ -19,31 +22,46 @@ public class OrphanedContentHandler :
 {
     private readonly IOrphanedLinkRepository _orphanedLinkRepository;
     private readonly IUmbracoContextFactory _umbracoContextFactory;
+    private readonly OrphanedLinksSettings _orphanedLinksSettings;
     private readonly ILogger _logger;
+
+    private readonly bool _allowDocTypeInclusion;
+    private readonly bool _allowDocTypeExclusion;
 
     public OrphanedContentHandler(
         IOrphanedLinkRepository orphanedLinkRepository,
+        IOptions<OrphanedLinksSettings> orphanedLinksSettings,
         IUmbracoContextFactory umbracoContextFactory,
         ILogger<OrphanedContentHandler> logger)
     {
         _orphanedLinkRepository = orphanedLinkRepository;
+        _orphanedLinksSettings = orphanedLinksSettings.Value;
         _umbracoContextFactory = umbracoContextFactory;
         _logger = logger;
+
+        // Including doc types takes precedence.
+        _allowDocTypeInclusion = _orphanedLinksSettings.Content.IncludedDocTypes.Any();
+
+        // Only allow exclusion of doc types if inclusion of doc types is not allowed.
+        _allowDocTypeExclusion = !_allowDocTypeInclusion && _orphanedLinksSettings.Content.ExcludedDocTypes.Any();
     }
 
     public void Handle(ContentUnpublishingNotification notification)
     {
-        HandleImpl(notification.UnpublishedEntities.Select(x => x.Key));
+        var filteredKeys = GetFilteredKeys(notification.UnpublishedEntities);
+        HandleImpl(filteredKeys);
     }
 
     public void Handle(ContentMovingToRecycleBinNotification notification)
     {
-        HandleImpl(notification.MoveInfoCollection.Select(x => x.Entity.Key));
+        var filteredKeys = GetFilteredKeys(notification.MoveInfoCollection.Select(x => x.Entity));
+        HandleImpl(filteredKeys);
     }
 
     public void Handle(ContentPublishingNotification notification)
     {
-        foreach (var key in notification.PublishedEntities.Select(x => x.Key))
+        var filteredKeys = GetFilteredKeys(notification.PublishedEntities);
+        foreach (var key in filteredKeys)
         {
             try
             {
@@ -51,7 +69,7 @@ public class OrphanedContentHandler :
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to remove {key} #orphaned-links", key);
+                _logger.LogError(ex, "Failed to remove content {key} #orphaned-links", key);
             }
         }
     }
@@ -101,5 +119,16 @@ public class OrphanedContentHandler :
                 _logger.LogError(ex, "Failed to add content {key} #orphaned-links", key);
             }
         }
+    }
+
+    private IEnumerable<Guid> GetFilteredKeys(IEnumerable<IContent> contents)
+    {
+        return contents
+            .Where(x =>
+                (!_allowDocTypeInclusion && !_allowDocTypeExclusion) ||
+                (_allowDocTypeInclusion && _orphanedLinksSettings.Content.IncludedDocTypes.Contains(x.ContentType.Alias)) ||
+                (_allowDocTypeExclusion && !_orphanedLinksSettings.Content.ExcludedDocTypes.Contains(x.ContentType.Alias))
+            )
+            .Select(x => x.Key);
     }
 }
