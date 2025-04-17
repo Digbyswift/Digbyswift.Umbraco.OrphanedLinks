@@ -33,9 +33,9 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<IOrphanedLinkRepository, OrphanedLinkRepository>();
 
-        // Register default implementation of LazyCache if it
-        // hasn't already been registered.
-        builder.Services.TryAddSingleton<IAppCache, CachingService>();
+        // Register default implementation of LazyCache. This is safe
+        // because it won't overwrite existing implementations.
+        builder.Services.AddLazyCache();
 
         // Register a facade for including the outputting of product
         // redirect original URLs in the redirect management dashboard.
