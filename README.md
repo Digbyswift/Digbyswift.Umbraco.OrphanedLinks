@@ -47,14 +47,32 @@ var umbracoBuilder = builder
 
 ## Config
 
-By default the package is enabled, but you can disable it using the following config setting:
+By default the package is enabled and assumes the following optional configuration:
 
 ```json
 {
   "Digbyswift": {
     "OrphanedLinks": {
-      "Enabled": false
+      "Enabled": true,
+      "Content": {
+        "Enabled": true,
+        "IncludedDocTypes": [],
+        "ExcludedDocTypes": []
+      },
+      "Media": {
+        "Enabled": true,
+        "IncludedMediaTypes": [],
+        "ExcludedMediaTypes": []
+      }
     }
   }
 }
 ```
+
+### Included/excluded types
+
+The following rules apply:
+
+ - Setting one or more included types for media or content will result in any excluded types being ignored.
+ - Setting `[]` for included types (or not providing this setting) is the equivalent of including all types.
+ - Setting `[]` for excluded types (or not providing this setting) is the equivalent of excluding all types.
