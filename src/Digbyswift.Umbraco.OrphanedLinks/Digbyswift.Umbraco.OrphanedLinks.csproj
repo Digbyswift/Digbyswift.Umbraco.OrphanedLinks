@@ -6,9 +6,9 @@
         <PackageProjectUrl>https://github.com/digbyswift/Digbyswift.Umbraco.OrphanedLinks</PackageProjectUrl>
         <RepositoryUrl>https://github.com/digbyswift/Digbyswift.Umbraco.OrphanedLinks</RepositoryUrl>
         <PackageTags>c# umbraco</PackageTags>
-        <PackageVersion>1.1.0</PackageVersion>
-        <AssemblyVersion>1.1.0</AssemblyVersion>
-        <FileVersion>1.1.0</FileVersion>
+        <PackageVersion>1.1.1</PackageVersion>
+        <AssemblyVersion>1.1.1</AssemblyVersion>
+        <FileVersion>1.1.1</FileVersion>
         <Nullable>enable</Nullable>
     </PropertyGroup>
     <ItemGroup>
